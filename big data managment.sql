@@ -1,8 +1,22 @@
-Πίνακες:
+'''
+Get Data: https://www.imdb.com/interfaces/
+Data used:
+- title_data: title.basics.tsv.gz
+- name_data: name.basics.tsv.gz
+- ratings_data: title.ratings.tsv.gz
 
-SET session_replication_role TO replica
-SET session_replication_role TO 'origin'
+Questions to be answered:
+1) Create the nessesery tables and import Data 
+2) Implement the sql queries below: 
+ A) Find all directors(not including assistant directors etc.) that where born in 1939 and show their names.
+ B) Find all productions (movies, tvseries, etc.) that have the best ratings and at least 1 million reviews. Show titles and rating.
+ C) Find 10 longest running tvseries with at least 100.000 reviews. Show titles, their "age" in descending order and if they are still on air.
+ D) Find actors (regardless gender) with at least 4 productions that are known for. Calculate thir average rating for the productions that have at least 1.5 million
+ reviews. Show their names and avg rating in descending order for those with avg rating bigger than 9.
+3) Query optimization with indexes.
 
+'''
+#1)
 CREATE TABLE title (
 	tconst varchar,
 	titleType char(255),
@@ -46,11 +60,9 @@ COPY name_data(nconst, primaryName, birthYear, deathYear, primaryProfession, kno
 FROM 'E:\name_data.tsv'
 with DELIMITER E'\t' NULL '\N' csv header
 
-A).....................................
-create INDEX idx_pro_birth
-ON name_data(primaryprofession,birthyear)
 
-EXPLAIN (ANALYZE, COSTS, VERBOSE, BUFFERS, FORMAT JSON)
+#2.A)
+
 select primaryname from name_data 
 where birthyear=1939
 and 
@@ -58,27 +70,17 @@ and
 or 
 primaryprofession like 'director%')
 
-553
 
-B)..........................................
+#2.B)
 
-EXPLAIN (ANALYZE, COSTS, VERBOSE, BUFFERS, FORMAT JSON)
 select primarytitle, averagerating from title
 inner join ratings
 on title.tconst=ratings.tconst
 where genres like '%Thriller%' and numvotes>=1000000
 order by averagerating desc
 
-create INDEX idx_numvotes
-ON ratings(numvotes)
+#2.C)
 
-5
-C).............................................
-
-create INDEX idx_numvotes
-ON ratings(numvotes)
-
-EXPLAIN (ANALYZE, COSTS, VERBOSE, BUFFERS, FORMAT JSON)
 select primarytitle,
 (coalesce(endyear,2021) - startyear)as age, 
 case
@@ -92,22 +94,8 @@ where titletype='tvSeries' and numvotes>=100000
 order by age desc
 limit 10
 
-d).................................................
+#2.D)
 
-000000000000000000000000000
-
-SELECT pg_size_pretty(PG_RELATION_SIZE('""'))
-000000000000000000000000000000
-
-select actors.primaryname,avg(ratings.averagerating) as avg_all
-from actors
-inner join ratings on actors.tconst=ratings.tconst
-where ratings.numvotes>=1500000 and actors.num_of_titles>=4 
-group by actors.primaryname
-having avg(ratings.averagerating) > 9
-order by avg_all desc 
-
-111111111111111111111111111111111111
 select actors.primaryname,round(avg(ratings.averagerating),2) as avg_all from
 (select nconst, primaryname,
 array_length(string_to_array(knownfortitles,','),1) as num_of_titles,
@@ -119,4 +107,9 @@ group by actors.primaryname
 having avg(ratings.averagerating) > 9
 order by avg_all desc 
 
-855
+#3)
+A) create INDEX idx_birthyear ON name_data(birthyear)
+B) create INDEX idx_numvotes ON ratings(numvotes)
+C) create INDEX idx_numvotes ON ratings(numvotes)
+D) create INDEX idx_numvotes ON ratings(numvotes)
+
