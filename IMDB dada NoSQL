@@ -1,0 +1,37 @@
+'''
+Get Data: https://www.imdb.com/interfaces/
+
+Questions to be answered:
+1) Import Data 
+2) Implement the queries below: 
+ A) Find all directors that where born in 1939 and show their names.
+ B) Find all Thriller productions (movies, tvseries, etc.) that have the best ratings and at least 100.000 reviews. Show titles and rating.
+ C) Find 10 longest running tvseries with at least 100.000 reviews. Show titles and their "age" in descending order. If they aren't still on air calculate their age using 2021.
+ D) Find the number of movies in each genre and the average rating for movies after 1980. Order by number of movies in descending order.
+3) Query optimization with indexes.
+'''
+
+1) Import necessary Data:
+
+mongoimport --jsonArray --db name --file C:\Users\name_basics.json
+mongoimport --jsonArray --db title --file C:\Users\title_basics.json
+
+2.A)
+db.name_basics.find({birthYear: 1939 , primaryProfession:"director"}, { primaryName: 1, _id:0})
+
+2.B)
+db.title_basics.find({genres:"Thriller", numVotes:{$gte:100000}}, {primaryTitle:1, averageRating:1, _id:0 } ).sort({averageRating:-1}).limit(6)
+
+2.C)
+db.title_basics.updateMany( {} , [{ $set: {age: {$cond: {if: {$eq:["$endYear",null]}, then:{$subtract:[2021, "$startYear"]}, else:{ $subtract:[ "$endYear", "$startYear"]}}}}}]) 
+
+db.title_basics.find({titleType: "tvSeries", numVotes:{$gte:100000}},{primaryTitle:1,age:1,_id:0}).sort({age:-1}).limit(10)
+
+2.D)
+db.title_basics.aggregate([{$match:{startYear:{$gt:1980},titleType:"movie"}},{$unwind: "$genres"},{$group:{_id:"$genres",count:{$sum:1},avg:{$avg:"$averageRating"}}}]).sort({count:-1})
+
+3)
+A)db.name_basics.createIndex({"birthYear":1})
+B)db.name_basics.createIndex({"numVotes":1, "genres":1})
+C)db.title_basics.createIndex({"numVotes":1})
+D)db.title_basics.createIndex({"titleType":1})
