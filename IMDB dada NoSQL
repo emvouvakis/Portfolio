@@ -1,6 +1,8 @@
 '''
 Get Data: https://www.imdb.com/interfaces/
 
+The data used here where preprocessed
+
 Questions to be answered:
 1) Import Data 
 2) Implement the queries below: 
