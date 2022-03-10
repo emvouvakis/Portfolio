@@ -9,7 +9,7 @@ Questions to be answered:
 1) Create the nessesery tables and import Data 
 2) Implement the sql queries below: 
  A) Find all directors(not including assistant directors etc.) that where born in 1939 and show their names.
- B) Find all productions (movies, tvseries, etc.) that have the best ratings and at least 1 million reviews. Show titles and rating.
+ B) Find all Thriller productions (movies, tvseries, etc.) that have the best ratings and at least 1 million reviews. Show titles and rating.
  C) Find 10 longest running tvseries with at least 100.000 reviews. Show titles, their "age" in descending order and if they are still on air.
  D) Find actors (regardless gender) with at least 4 productions that are known for. Calculate thir average rating for the productions that have at least 1.5 million
  reviews. Show their names and avg rating in descending order for those with avg rating bigger than 9.
