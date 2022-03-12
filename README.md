@@ -1,7 +1,7 @@
 <h1 align="center">Hi 👋, I'm Manolis Vouvakis</h1>
 <h3 align="center">A passionate economist for Data Analytics</h3>
 
-- 🌱 I’m currently studing for **my Master's Degree in Business and Data Analytics**
+- 🌱 I’m currently studying for **my Master's Degree in Business and Data Analytics**
 
 <h3 align="left">Connect with me:</h3>
 <p align="left">
