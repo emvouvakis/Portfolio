@@ -2,6 +2,7 @@
 <h3 align="center">A passionate economist for Data Analytics</h3>
 
 - 🌱 I’m currently studying for **my Master's Degree in Business and Data Analytics**
+- 👨‍💻 All of my projects are available at [https://emvouvakis.github.io/](https://emvouvakis.github.io/)
 
 <h3 align="left">Connect with me:</h3>
 <p align="left">
