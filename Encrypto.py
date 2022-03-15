@@ -1,8 +1,10 @@
 import base64
+from tkinter import filedialog
 from cryptography.fernet import Fernet
 from cryptography.hazmat.primitives import hashes
 from cryptography.hazmat.primitives.kdf.pbkdf2 import PBKDF2HMAC
 from tkinter import *
+import os
 
 root = Tk()
 root.title("Encrypto")
@@ -16,9 +18,11 @@ canvas.grid(columnspan=2, rowspan=3)
 
 
 def get_data():
-    global salt,pwd,f_add,e3,e4
+    global salt,pwd,f_add,e3,e4,f
+    '''Get key1, key2 from entries'''
     pwd=e1.get().encode()
     salt=e2.get().encode()
+    '''Setting GUI elements'''
     f_add=LabelFrame(root, text="Usage - Password", padx=5, pady=5)
     f_add.grid(column=0,row=1)
     e3=Entry(f_add,width=20)
@@ -27,45 +31,40 @@ def get_data():
     e4.grid(column=1, row=1)
     button_add1= Button(f_add, text="Add Password", command=add)
     button_add1.grid(column=2,row=1)
-    view()
-
-def add():
-    global salt
+    '''coding algorithm'''
     kdf = PBKDF2HMAC(
     algorithm=hashes.SHA256(),
     length=32,
     salt=salt,
     iterations=390000)
-
     key = base64.urlsafe_b64encode(kdf.derive(pwd))
     f = Fernet(key)
+    '''continue'''
+    view()
+
+def add():
+    global salt
+    
     name=e3.get()
     given_pwd=e4.get()
-    with open('passwords.txt', 'a') as p:
+    with open(filename, 'a') as p:
         p.write(name + "|" + f.encrypt(given_pwd.encode()).decode() + "\n")
     view()
 
 def view():
     global salt
-    counter=0
-    kdf = PBKDF2HMAC(
-    algorithm=hashes.SHA256(),
-    length=32,
-    salt=salt,
-    iterations=390000)
-    key = base64.urlsafe_b64encode(kdf.derive(pwd))
-    f = Fernet(key)
+    #counter=0
     f_box=LabelFrame(root, text="View Passwords", padx=5, pady=5)
     f_box.grid(column=0,row=2)
     #button_view= Button(f_box, text="View", command=view)
     #button_view.grid(column=2, row=2)
-    with open('passwords.txt', 'r') as p:
+    with open(filename, 'r') as p:
         box=Text(f_box, height=15, width=45)
         box.grid(column=0,row=2)
         for line in p.readlines():
-            counter+=1
-            if counter==0:
-                break
+            #counter+=1
+            #if counter==0:
+                #break
             data = line.rstrip()
             user, v_pwd = data.split("|")
             try: 
@@ -77,18 +76,36 @@ def view():
                 box.insert(END, result)
 
 
-'''First stage-Buttons and Entries to start'''
-f_keys=LabelFrame(root, text="Key 1 - Key 2", padx=5, pady=5)
-f_keys.grid(column=0,row=0)
+def click():
+    global filename
+    filename= filedialog.askopenfilename(initialdir='C:/Users/%s', title="Select a File", filetypes=[("Text Files", "*.txt")])
+    if filename=="":
+        pass
+    else:
+        file=os.path.split(filename)[1]
+        root.title("Encrypto "+file)
+        keys()
+        
 
-button_keys= Button(f_keys, text="Use Keys",command=get_data)
-button_keys.grid(column=2,row=0)
+'''First stage button - Select File'''
+file_keys= Button(root, text="Select File",command=click)
+file_keys.grid(column=0,row=0)
 
 
-e1=Entry(f_keys,width=20)
-e1.grid(column=0, row=0)
-e2=Entry(f_keys,width=20)
-e2.grid(column=1, row=0)
+
+def keys():
+    global e1,e2
+    f_keys=LabelFrame(root, text="Key 1 - Key 2", padx=5, pady=5)
+    f_keys.grid(column=0,row=0)
+
+    button_keys= Button(f_keys, text="Use Keys",command=get_data)
+    button_keys.grid(column=2,row=0)
+
+
+    e1=Entry(f_keys,width=20)
+    e1.grid(column=0, row=0)
+    e2=Entry(f_keys,width=20)
+    e2.grid(column=1, row=0)
 
 '''Information'''
 f_info=LabelFrame(root, text="Information", padx=5, pady=5)
@@ -100,6 +117,14 @@ result="Welcome to Encrypto! \n\nProject for password encryption. \nMade by : Em
 
 b_info.insert(END, result)
 
+'''Menu'''
+my_menu=Menu(root)
+root.config(menu=my_menu)
+
+file_menu=Menu(my_menu)
+my_menu.add_cascade(label="Options",menu=file_menu)
+file_menu.add_command(label="Select File", command=click)
+file_menu.add_command(label="Exit", command=root.quit)
 
 
 root.mainloop()
