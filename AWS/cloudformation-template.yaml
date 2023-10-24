@@ -1,0 +1,44 @@
+Resources:
+  # Define an S3 bucket resource named MyS3Bucket
+  MyS3Bucket:
+    Type: AWS::S3::Bucket
+    Properties:
+      BucketName: test-bucket  # Specify the name of the S3 bucket
+
+  # Define an IAM role resource named MyIAMRole
+  MyIAMRole:
+    Type: AWS::IAM::Role
+    Properties:
+      RoleName: Cloudformation-IAM-role  # Specify the name of the IAM role
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'  # Define the AWS IAM policy version
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service: lambda.amazonaws.com  # Allow Lambda service to assume this role
+            Action: sts:AssumeRole  # Define the action to assume the role
+      ManagedPolicyArns:
+        - arn:aws:iam::aws:policy/AmazonAthenaFullAccess  # Attach Amazon Athena full access policy
+        - arn:aws:iam::aws:policy/AmazonDynamoDBFullAccess  # Attach Amazon DynamoDB full access policy
+        - arn:aws:iam::aws:policy/AmazonS3FullAccess  # Attach Amazon S3 full access policy
+        - arn:aws:iam::aws:policy/AWSLambda_FullAccess  # Attach AWS Lambda full access policy
+
+  # Define an AWS Lambda function resource named MyLambdaFunction
+  MyLambdaFunction:
+    Type: AWS::Lambda::Function
+    Properties:
+      FunctionName: Cloudformation-Lambda  # Specify the Lambda function name
+      Handler: lambda_handler.handler  # Update this to specify the Lambda function handler
+      Role: !GetAtt MyIAMRole.Arn  # Use the IAM role created earlier
+      Runtime: python3.8  # Specify the runtime for the Lambda function
+      Code:
+        S3Bucket: selected-bucket  # Specify the S3 bucket containing the Lambda code
+        S3Key: lambda-copy.zip  # Specify the object key of the Lambda code package
+      Layers:
+        - arn:aws:lambda:example:layer:AWSSDKPandas-Python38:11  # Insert pandas layer arn
+
+Outputs:
+  # Define an output named MyS3BucketName
+  MyS3BucketName:
+    Description: S3 Bucket Name  # Description of the output
+    Value: !Ref MyS3Bucket  # Get the reference to the MyS3Bucket resource
