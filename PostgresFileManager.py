@@ -139,12 +139,12 @@ class PostgresFileManager:
             raise e
 
 # Example usage
-file_handler = PostgresFileManager(
-                host='your_database_host',
-                dbname='your_database_name',
-                user='your_database_user',
-                password='your_database_password'
+postgres = PostgresFileManager(
+                host='your_postgres_host',
+                dbname='your_postgres_name',
+                user='your_postgres_user',
+                password='your_postgres_password'
                 )
 
-file_handler.upload_file(file = 'file.csv') 
-file_handler.download_file(1)
+postgres.upload_file(file = 'file.csv') 
+postgres.download_file(1)
